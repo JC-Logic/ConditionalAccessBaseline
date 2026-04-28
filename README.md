@@ -249,7 +249,7 @@ This policy requires MFA for all internal identities, for all cloud applications
 
 
 > [!IMPORTANT]
-> Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
+> Verify the included group(s) and/or add your custom groups which have all internals in it. CA-Internals is used as the standard tenant-local target group for internal users.
 
 ![CA200](./Images/CA200.png)
 
@@ -258,7 +258,7 @@ This policy requires MFA for all internal identities, for all cloud applications
 This policy sets a Sign-in frequency to a maximum of 12 hours for internals, to all cloud apps, using unmanaged Windows or MacOS devices.
 
 > [!IMPORTANT]
-> Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
+> Verify the included group(s) and/or add your custom groups which have all internals in it. CA-Internals is used as the standard tenant-local target group for internal users.
 
 ![CA202](./Images/CA202.png)
 
@@ -267,7 +267,7 @@ This policy sets a Sign-in frequency to a maximum of 12 hours for internals, to 
 This policy requires MFA for internals when enrolling their devices in Intune.
 
 > [!IMPORTANT]
-> Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
+> Verify the included group(s) and/or add your custom groups which have all internals in it. CA-Internals is used as the standard tenant-local target group for internal users.
 
 > [!IMPORTANT]
 > Autopilot Device Preparation (v2) enrollment can fail under this policy, resulting in devices getting stuck during OOBE. This happens because the automated enrollment process is unable to fulfill the MFA requirement. To avoid this issue, add Autopilot Device Preparation users to the exclusion group for this policy.
@@ -282,7 +282,7 @@ This policy blocks unknown/unsupported device platforms for internals.
 > Currently only Windows, MacOS, Android and iOS are supported. If (for example) Linux or Windows Phone is allowed you need to modify the policy.
 
 > [!IMPORTANT]
-> Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
+> Verify the included group(s) and/or add your custom groups which have all internals in it. CA-Internals is used as the standard tenant-local target group for internal users.
 
 ![CA204](./Images/CA204.png)
 
@@ -291,7 +291,7 @@ This policy blocks unknown/unsupported device platforms for internals.
 This policy requires internals to make use of a Windows device that is compliant or AADHJ (Azure AD Hybrid Joined / Entra ID Hybrid Joined) while accessing any cloud app.
 
 > [!IMPORTANT]
-> Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
+> Verify the included group(s) and/or add your custom groups which have all internals in it. CA-Internals is used as the standard tenant-local target group for internal users.
 
 ![CA205](./Images/CA205.png)
 
@@ -300,7 +300,7 @@ This policy requires internals to make use of a Windows device that is compliant
 This policy prevents having persistent browser sessions for internals from unmanaged devices. Managed and compliant devices are excluded from the policy.
 
 > [!IMPORTANT]
-> Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
+> Verify the included group(s) and/or add your custom groups which have all internals in it. CA-Internals is used as the standard tenant-local target group for internal users.
 
 ![CA206](./Images/CA206-new.png)
 
@@ -309,7 +309,7 @@ This policy prevents having persistent browser sessions for internals from unman
 This policy prevents internals from accessing specific apps. In this example i've blocked a random app. You should review the included and excluded apps. Excluding office 365 is not necessary if its not included. This is just an example. 
 
 > [!IMPORTANT]
-> Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
+> Verify the included group(s) and/or add your custom groups which have all internals in it. CA-Internals is used as the standard tenant-local target group for internal users.
 
 ![CA207](./Images/CA207.png)
 
@@ -318,7 +318,7 @@ This policy prevents internals from accessing specific apps. In this example i'v
 This policy requires MacOS devices to be compliant for internals.
 
 > [!IMPORTANT]
-> Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
+> Verify the included group(s) and/or add your custom groups which have all internals in it. CA-Internals is used as the standard tenant-local target group for internal users.
 
 ![CA208](./Images/CA208.png)
 
@@ -327,7 +327,7 @@ This policy requires MacOS devices to be compliant for internals.
 This policy allows Microsoft Entra ID to re-evaluate a user's access to resources in near real-time, rather than waiting for the typical token expiration time (which could be up to an hour). Read the Microsoft documentation here: https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-continuous-access-evaluation#conditional-access-policy-evaluation-preview.
 
 > [!IMPORTANT]
-> Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
+> Verify the included group(s) and/or add your custom groups which have all internals in it. CA-Internals is used as the standard tenant-local target group for internal users.
 
 > [!IMPORTANT]
 > This CA rule cannot be created in Report-only mode. Supported modes are **ON** or **OFF**.
@@ -339,7 +339,7 @@ This policy allows Microsoft Entra ID to re-evaluate a user's access to resource
 This policy requires ServiceAccounts to use MFA, from any platform when accessing any cloud app.
 
 > [!IMPORTANT]
-> Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
+> Verify the included group(s) and/or add your custom groups which have all service accounts in it. CA-ServiceAccounts is used as the standard tenant-local target group for service accounts.
 
 ![CA300](./Images/CA300.png)
 
@@ -420,14 +420,34 @@ There are two practical deployment modes:
 
 2. **Standards deployment:** Add the CA template to **Tenant Administration > Standards & Drift**. Standards are for desired-state management: CIPP reapplies the configured standard on a schedule and can overwrite out-of-band admin changes. CIPP's docs describe Standards as reapplying/evaluating every 12 hours in the [Standards & Drift](https://docs.cipp.app/user-documentation/tenant/standards.md) page, while the [Standards Setup](https://docs.cipp.app/setup/implementation-guide/standards-setup.md) guide currently mentions 3 hours. Treat the exact interval as version-dependent and check the live docs or CIPP logs for your instance. In Standards, CIPP always uses `Replace IDs with Display Names`.
 
+Required tenant groups:
+
+Deploy the tenant-local Entra security groups before deploying Conditional Access templates. CIPP can deploy reusable groups from [Group Templates](https://docs.cipp.app/user-documentation/identity/administration/group-templates.md) and [Deploy Group Templates](https://docs.cipp.app/user-documentation/identity/administration/group-templates/deploy.md). Do this as a separate prerequisite step so CA policy deployment can resolve the group display names consistently.
+
+Minimum group structure per tenant:
+
+* `CA-Internals`: include standard internal users who should receive the Internals CA policies. Use dynamic membership if the tenant has a reliable rule; otherwise keep it assigned and managed by onboarding/offboarding.
+* `CA-ServiceAccounts`: include only interactive service/shared accounts that cannot yet be replaced with better workload identity patterns. Keep empty if there are none.
+* `CA-BreakGlassAccounts - Exclude`: include emergency access accounts before turning policies on.
+* Per-policy `... - Exclude` groups: deploy these empty by default. Use them for tenant-specific exceptions instead of editing the CA policy directly.
+
+Recommended order:
+
+1. Create/import CIPP group templates for the required group names.
+2. Deploy the group templates to the target tenants.
+3. Populate `CA-Internals`, `CA-ServiceAccounts`, and `CA-BreakGlassAccounts - Exclude`.
+4. Leave per-policy exclude groups empty unless there is a documented exception.
+5. Deploy CA templates in Report-only and confirm CIPP resolves group names as expected.
+
 Recommended CIPP rollout flow:
 
 1. Confirm tenant prerequisites first: Security Defaults off, break-glass account created, emergency exclusions ready, MSP/GDAP access exclusions ready, and the Microsoft Intune Enrollment service principal present if using enrollment/device-compliance policies.
-2. Import or create the CA templates in CIPP.
-3. Review every template before deployment, especially included users/groups, excluded users/groups, named locations, app targets, authentication strengths, and policy state.
-4. Deploy to a pilot tenant or pilot user group in **Report-only** where supported. CIPP's user-level [Conditional Access test](https://docs.cipp.app/user-documentation/identity/administration/users/user/conditional-access.md) page can test application, country, IP address, platform, and client-app scenarios and shows whether a policy applies.
-5. Move low-risk controls on first, such as legacy-auth blocking and MFA, then add higher-friction controls like device compliance, location blocks, and strict session controls.
-6. After the pilot is clean, either deploy one-off to selected tenants or attach the template to a Standards template for ongoing enforcement.
+2. Deploy the required tenant groups and populate the target/exclusion groups.
+3. Import or create the CA templates in CIPP.
+4. Review every template before deployment, especially included users/groups, excluded users/groups, named locations, app targets, authentication strengths, and policy state.
+5. Deploy to a pilot tenant or pilot user group in **Report-only** where supported. CIPP's user-level [Conditional Access test](https://docs.cipp.app/user-documentation/identity/administration/users/user/conditional-access.md) page can test application, country, IP address, platform, and client-app scenarios and shows whether a policy applies.
+6. Move low-risk controls on first, such as legacy-auth blocking and MFA, then add higher-friction controls like device compliance, location blocks, and strict session controls.
+7. After the pilot is clean, either deploy one-off to selected tenants or attach the template to a Standards template for ongoing enforcement.
 
 MSP/GDAP lockout checks:
 
@@ -457,6 +477,8 @@ Current CIPP documentation entry points:
 * Named locations: [Named Locations](https://docs.cipp.app/user-documentation/tenant/conditional/list-named-locations.md)
 * Standards: [Standards & Drift](https://docs.cipp.app/user-documentation/tenant/standards.md)
 * Standards setup: [Standards Setup](https://docs.cipp.app/setup/implementation-guide/standards-setup.md)
+* Group templates: [Group Templates](https://docs.cipp.app/user-documentation/identity/administration/group-templates.md)
+* Deploy group templates: [Deploy Group Templates](https://docs.cipp.app/user-documentation/identity/administration/group-templates/deploy.md)
 * Conditional Access testing: [User Conditional Access test](https://docs.cipp.app/user-documentation/identity/administration/users/user/conditional-access.md)
 * CIPP service account and GDAP CA guidance: [Conditional Access Configuration](https://docs.cipp.app/setup/installation/conditionalaccess.md)
 * Configuration backup: [Configuration Backup](https://docs.cipp.app/user-documentation/tenant/manage/backup.md)
