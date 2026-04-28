@@ -424,6 +424,8 @@ Required tenant groups:
 
 Deploy the tenant-local Entra security groups before deploying Conditional Access templates. CIPP can deploy reusable groups from [Group Templates](https://docs.cipp.app/user-documentation/identity/administration/group-templates.md) and [Deploy Group Templates](https://docs.cipp.app/user-documentation/identity/administration/group-templates/deploy.md). Do this as a separate prerequisite step so CA policy deployment can resolve the group display names consistently.
 
+In CIPP group templates, **Username** is the group's `mailNickname` / alias, not the Entra object ID. Use a stable lowercase alias such as `ca-internals`, `ca-serviceaccounts`, or `ca-breakglassaccounts-exclude`. Conditional Access templates still contain source-tenant object IDs internally, but CIPP deployment translates those references by display name when using `Replace IDs with Display Names`; Standards always use that replacement mode. The display name is the part that must match exactly.
+
 Minimum group structure per tenant:
 
 * `CA-Internals`: include standard internal users who should receive the Internals CA policies. Use dynamic membership if the tenant has a reliable rule; otherwise keep it assigned and managed by onboarding/offboarding.
