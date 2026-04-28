@@ -3,7 +3,7 @@
 This conditional access baseline is based on the Microsoft Conditional Access Baseline by Claus Jespersen. This one is slightly minimized and less difficult to understand but still protects almost everything you could wish for. Use this baseline to start off with and expend or modify where needed.
 
 > [!TIP]
-> There's no need to create policies, groups or named locations yourself. This can be done automated using Mick-K his [Intune Management tool](https://github.com/Micke-K/IntuneManagement). This is described in [Importing the baseline](#importing-the-baseline).
+> This baseline is intended to be deployed through CIPP Conditional Access templates and Standards.
 
 
 > [!IMPORTANT]
@@ -27,7 +27,6 @@ This conditional access baseline is based on the Microsoft Conditional Access Ba
       - [Admins](#admins)
       - [Internals](#internals)
       - [Guests](#guests)
-      - [Agents](#agents)
   - [Conditional access policies](#conditional-access-policies)
     - [CA000-Global-IdentityProtection-AnyApp-AnyPlatform-MFA](#ca000-global-identityprotection-anyapp-anyplatform-mfa)
     - [CA001-Global-AttackSurfaceReduction-AnyApp-AnyPlatform-BLOCK-CountryWhitelist](#ca001-global-attacksurfacereduction-anyapp-anyplatform-block-countrywhitelist)
@@ -43,7 +42,6 @@ This conditional access baseline is based on the Microsoft Conditional Access Ba
     - [CA104-Admins-IdentityProtection-AllApps-AnyPlatform-ContinuousAccessEvaluation](#ca104-admins-identityprotection-allapps-anyplatform-continuousaccessevaluation)
     - [CA105-Admins-IdentityProtection-AnyApp-AnyPlatform-PhishingResistantMFA](#ca105-admins-identityprotection-anyapp-anyplatform-phishingresistantmfa)
     - [CA200-Internals-IdentityProtection-AnyApp-AnyPlatform-MFA](#ca200-internals-identityprotection-anyapp-anyplatform-mfa)
-    - [CA201-Internals-IdentityProtection-AnyApp-AnyPlatform-BLOCK-HighRiskUser](#ca201-internals-identityprotection-anyapp-anyplatform-block-highriskuser)
     - [CA202-Internals-IdentityProtection-AllApps-WindowsMacOS-SigninFrequency-UnmanagedDevices](#ca202-internals-identityprotection-allapps-windowsmacos-signinfrequency-unmanageddevices)
     - [CA203-Internals-AppProtection-MicrosoftIntuneEnrollment-AnyPlatform-MFA](#ca203-internals-appprotection-microsoftintuneenrollment-anyplatform-mfa)
     - [CA204-Internals-AttackSurfaceReduction-AllApps-AnyPlatform-BlockUnknownPlatforms](#ca204-internals-attacksurfacereduction-allapps-anyplatform-blockunknownplatforms)
@@ -59,13 +57,10 @@ This conditional access baseline is based on the Microsoft Conditional Access Ba
     - [CA402-GuestUsers-IdentityProtection-AllApps-AnyPlatform-SigninFrequency](#ca402-guestusers-identityprotection-allapps-anyplatform-signinfrequency)
     - [CA403-Guests-IdentityProtection-AllApps-AnyPlatform-PersistentBrowser](#ca403-guests-identityprotection-allapps-anyplatform-persistentbrowser)
     - [CA404-Guests-AttackSurfaceReduction-SelectedApps-AnyPlatform-BLOCK](#ca404-guests-attacksurfacereduction-selectedapps-anyplatform-block)
-    - [CA501-Agents-IdentityProtection-AnyApp-AnyPlatform-BLOCK-HighRiskAgent](#ca501-agents-identityprotection-anyapp-anyplatform-block-highriskagent)
   - [Named locations](#named-locations)
   - [Considerations](#considerations)
   - [Troubleshooting](#troubleshooting)
-  - [Importing the baseline](#importing-the-baseline)
-    - [Setup IntuneManagement](#setup-intunemanagement)
-    - [Import the configuration](#import-the-configuration)
+  - [Deploying with CIPP](#deploying-with-cipp)
 
 
 
@@ -118,11 +113,10 @@ This conditional access baseline is based on the Microsoft Conditional Access Ba
 * CA206: Wrong exclusion group was assigned. Has been fixed.
 
 ### 2025.2.3
-* CA201: Policy contained Signin Risk and User Risk in a single policy. Now separated into CA201 and CA210
-* CA210: Separated (new) policy for Signin Risk
+* Removed risk-based policies from this baseline because they require Microsoft Entra ID P2.
 
 ### 2026.2.1
-* CA501: Template policy for High Risk Agents adopted into the framework.
+* Risk-based agent policies are not included because they require Microsoft Entra ID P2.
 * CA005: Modified policy from **Require approved client app** to **RequireAppProtection** as this is being retired per March 2026.
   
 
@@ -154,10 +148,6 @@ standard end-user role.
 #### Guests
 Guests holds all users who have an Azure AD guest account 
 that has been invited into the customer tenant
-
-#### Agents
-Agents covers all agent related resources which can be managed through Conditional Access
-
 
 ## Conditional access policies
 
@@ -262,15 +252,6 @@ This policy requires MFA for all internal identities, for all cloud applications
 > Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
 
 ![CA200](./Images/CA200.png)
-
-### CA201-Internals-IdentityProtection-AnyApp-AnyPlatform-BLOCK-HighRiskUser
-
-This policy blocks all internal users which have a **high risk** (user risk) status, to all cloud apps, from all platforms.
-
-> [!IMPORTANT]
-> Verify the included group(s) and/or add your custom groups which have all internals in it. APP_Microsoft365_E5 is added as an example.
-
-![CA201](./Images/CA201.1.png)
 
 ### CA202-Internals-IdentityProtection-AllApps-WindowsMacOS-SigninFrequency-UnmanagedDevices
 
@@ -407,12 +388,6 @@ This policy prevents guests from accessing specific apps. In this example i've b
 
 ![CA404](./Images/CA404.png)
 
-### CA501-Agents-IdentityProtection-AnyApp-AnyPlatform-BLOCK-HighRiskAgent
-
-This policy blocks agent identities with a high risk level from accessing resources in your tenant.
-
-![CA501](./Images/CA501.png)
-
 ## Named locations
 
 | Name | Location type | Assigned to policy |
@@ -435,78 +410,54 @@ This policy blocks agent identities with a high risk level from accessing resour
 
 3. Windows first sign-in restore fails with error _You can’t get there from here. This application contains sensitive information and can only be accessed from devices or client applications that meet management compliance policy._. This is blocked by policy CA205 (CA205-Internals-BaseProtection-AnyApp-Windows-CompliantorAADHJ). Add an exclusion for **Microsoft Activity Feed Service** (d32c68ad-72d2-4acb-a0c7-46bb2cf93873) in this policy.
 
-## Importing the baseline
+## Deploying with CIPP
 
-These PowerShell scripts are using Microsoft Authentication Library (MSAL), Microsoft Graph APIs and Azure Management APIs to manage objects in Intune and Azure. The scripts has a simple WPF UI and it supports operations like Export, Import, Copy, Download, Compare etc.
+Use CIPP's [CA Templates](https://docs.cipp.app/user-documentation/tenant/conditional/list-template.md) page to browse/import templates, deploy a template, edit a template, save templates to GitHub, or review template sync logs. Use [CA Policies](https://docs.cipp.app/user-documentation/tenant/conditional/list-policies.md) when reviewing a tenant's live policies or when creating a CIPP template from an existing policy.
 
-This makes it easy to backup or clone a complete Intune environment. The scripts can export and import objects including assignments and support import/export between tenants. The scripts will create a migration table during export and use that for importing assignments in other environments. It will create missing groups in the target environment during import. Group information like name, description and type will be imported based on the exported group e.g. dynamic groups are supported. There will be one json file for each group in the export folder.
+There are two practical deployment modes:
 
-The script also support dependencies e.g. an App Protection is depending on an App, Policy Sets are depending on Compliance Policies, objects has Scope Tags etc. Dependency support requires exported json files and that the dependency objects are imported in the environment. The script uses the exported json files to get the Id and name's of the exported object and uses that information and updates Id's before import an object from a json file. The Bulk Import form shows the import order of the objects. The objects with the lowest order number will be imported first.
+1. **One-off deployment:** Deploy a template from **Tenant Administration > Conditional Access > CA Templates**. The wizard can set deployment state, exclusions, and replacement behavior. For cross-tenant templates, CIPP calls out `Replace IDs with Display Names` as the safe replacement method so tenant-specific object IDs do not break the deployment.
 
-![IntuneManagement1](./Images/IntuneManagement1.png)
+2. **Standards deployment:** Add the CA template to **Tenant Administration > Standards & Drift**. Standards are for desired-state management: CIPP reapplies the configured standard on a schedule and can overwrite out-of-band admin changes. CIPP's docs describe Standards as reapplying/evaluating every 12 hours in the [Standards & Drift](https://docs.cipp.app/user-documentation/tenant/standards.md) page, while the [Standards Setup](https://docs.cipp.app/setup/implementation-guide/standards-setup.md) guide currently mentions 3 hours. Treat the exact interval as version-dependent and check the live docs or CIPP logs for your instance. In Standards, CIPP always uses `Replace IDs with Display Names`.
 
-> [!TIP]
-> The following tool is used: https://github.com/Micke-K/IntuneManagement. Always download the lastest version before importing or exporting data.
+Recommended CIPP rollout flow:
 
-### Setup IntuneManagement
+1. Confirm tenant prerequisites first: Security Defaults off, break-glass account created, emergency exclusions ready, MSP/GDAP access exclusions ready, and the Microsoft Intune Enrollment service principal present if using enrollment/device-compliance policies.
+2. Import or create the CA templates in CIPP.
+3. Review every template before deployment, especially included users/groups, excluded users/groups, named locations, app targets, authentication strengths, and policy state.
+4. Deploy to a pilot tenant or pilot user group in **Report-only** where supported. CIPP's user-level [Conditional Access test](https://docs.cipp.app/user-documentation/identity/administration/users/user/conditional-access.md) page can test application, country, IP address, platform, and client-app scenarios and shows whether a policy applies.
+5. Move low-risk controls on first, such as legacy-auth blocking and MFA, then add higher-friction controls like device compliance, location blocks, and strict session controls.
+6. After the pilot is clean, either deploy one-off to selected tenants or attach the template to a Standards template for ongoing enforcement.
 
-Start by downloading the files in GitHub. Extract the Github repo somewhere on your device. For example: *C:\Intune\IntuneManagement*.
+MSP/GDAP lockout checks:
 
-![IntuneManagement2](./Images/IntuneManagement2.png)
+* **Client tenants:** these templates include the CIPP variable `%msptenantid%` as a **Guest or external users > Service Provider Users > Selected** exclusion. Before deployment, create a CIPP global variable named `msptenantid` with your MSP tenant ID.
+* **Direct tenant mode:** exclude the CIPP service account in that tenant instead of the MSP tenant exclusion.
+* **Partner tenant:** do not leave the CIPP service account broadly unprotected. CIPP recommends excluding it from other existing CA policies, then protecting it with a dedicated all-cloud-apps MFA policy and sign-in frequency every time.
+* **CA401 guest blocking:** verify MSP/GDAP service-provider access still works before enabling tenant-wide. It is intended to block non-approved guest access, and this is exactly the kind of policy that can create partner-admin surprises if exclusions are wrong.
+* **Post-deployment proof:** test CIPP actions and GDAP/AOBO portal access after each blocking policy moves from Report-only to On. Do this before adding the policy to a recurring Standard.
 
-Unblock all .cmd/.ps1/.psd files with the following PowerShell command.
+Important CIPP gotchas:
 
-```
-Get-ChildItem -Path "C:\Intune\IntuneManagement\" -File -Recurse | Unblock-File
-```
+* **Standards are enforcement, not just deployment.** If a technician edits a policy directly in Entra, a CIPP Standard can reapply the template later. Deselecting or disabling remediation stops future enforcement but does not undo changes already made.
+* **Specific Standards win over broad Standards.** CIPP precedence is individual tenant over tenant group over All Tenants. When two standards conflict at the same specificity, the newer one wins.
+* **Named locations travel with templates created from policies.** CIPP says templates include policy settings such as named locations and authentication strengths. Still verify country/IP values in [Named Locations](https://docs.cipp.app/user-documentation/tenant/conditional/list-named-locations.md), especially for CA001 and CA301.
+* **CIPP exclusions are not optional hygiene.** Keep break-glass accounts excluded where appropriate. Add service-provider/MSP exceptions only where they are genuinely needed and understood.
+* **Continuous Access Evaluation templates are special.** CA104 and CA209 cannot be created in Report-only mode according to this repo's policy notes, so do not include them in a first-pass SMB Standard unless you are ready for direct enable/disable testing.
+* **Companion policies matter.** App protection and compliant-device CA policies only work as intended when the matching Intune app protection, enrollment, and compliance policies exist.
+* **Back up before broad changes.** CIPP's [Configuration Backup](https://docs.cipp.app/user-documentation/tenant/manage/backup.md) page can schedule or download tenant configuration backups; its restore wizard warns that selected categories are replaced during restore.
+* **Use CIPP reports after deployment.** [Policies and Settings Deployed](https://docs.cipp.app/user-documentation/tenant/manage/policies-deployed.md), [Applied Standards Report](https://docs.cipp.app/user-documentation/tenant/manage/applied-standards.md), CA policy logs, and CA template logs are the places to verify what CIPP deployed and what Standards are maintaining.
 
-Start the IntuneManagementTool
-```
-cd C:\Intune\IntuneManagement\
-.\Start-IntuneManagement.ps1
-```
+Current CIPP documentation entry points:
 
-Start by authenticating to your tenant with the profile icon in the top right.
-
-![IntuneManagement3](./Images/IntuneManagement3.png)
-
-In the modern authentication window that pops up, sign in with an account that has appropriate permissions, if unsure use Global Administrator. After sign-in you will be prompted to accept permissions for Microsoft Intune PowerShell, **DO NOT** tick the box to consent on behalf of your organisation.
-
-![IntuneManagement4](./Images/IntuneManagement4.png)
-
-It's likely the first time you do this you'll still see you don't have access to the settings, you'll know this as the menu on the left-hand side will have all text in red, like so.
-
-![IntuneManagement5](./Images/IntuneManagement5.png)
-
-From here, select the profile icon in the top right corner and then Request Consent again.
-
-![IntuneManagement6](./Images/IntuneManagement6.png)
-
-Go ahead and accept the popup again, this should clear all the red text on the left hand-side. **DO NOT** tick the box to consent on behalf of your organisation.
-
-![IntuneManagement7](./Images/IntuneManagement7.png)
-
-Now we can start importing, exporting, or comparing tenant configurations. 
-
-### Import the configuration
-
-1: Click on **Bulk** -> **Import**
-
-![IntuneManagement8](./Images/IntuneManagement8.png)
-
-2: Select the folder where you stored the conditional access policies.
-
-3: Decide if you want to import all the assignments or assign all policies yourself.
-
-4: Set "Conditional Access State" to **Off** or **Report-only**. Don't forget to enable these later! This should be done after MFA is setup for an Global Admin account and (if required) a Break the Glass account is created.
-
-5: Click **Import**
-
-![IntuneManagement9](./Images/IntuneManagement9.png)
-
-Once the importing is complete, all policies will be available for you to modify and/or enable them.
-
-> [!CAUTION]
-> Be careful activating the policies! Make sure you have decent exclusions and/or a break the glass account in place. Enable the policies one by one or start with report-only.
-
-![CA Policies](./Images/image2.png)
+* CIPP documentation index for agents and current page discovery: [llms.txt](https://docs.cipp.app/llms.txt)
+* Conditional Access overview: [Tenant Administration > Conditional Access](https://docs.cipp.app/user-documentation/tenant/conditional.md)
+* CA policies: [CA Policies](https://docs.cipp.app/user-documentation/tenant/conditional/list-policies.md)
+* CA templates: [CA Templates](https://docs.cipp.app/user-documentation/tenant/conditional/list-template.md)
+* Named locations: [Named Locations](https://docs.cipp.app/user-documentation/tenant/conditional/list-named-locations.md)
+* Standards: [Standards & Drift](https://docs.cipp.app/user-documentation/tenant/standards.md)
+* Standards setup: [Standards Setup](https://docs.cipp.app/setup/implementation-guide/standards-setup.md)
+* Conditional Access testing: [User Conditional Access test](https://docs.cipp.app/user-documentation/identity/administration/users/user/conditional-access.md)
+* CIPP service account and GDAP CA guidance: [Conditional Access Configuration](https://docs.cipp.app/setup/installation/conditionalaccess.md)
+* Configuration backup: [Configuration Backup](https://docs.cipp.app/user-documentation/tenant/manage/backup.md)
+* Deployed policies report: [Policies and Settings Deployed](https://docs.cipp.app/user-documentation/tenant/manage/policies-deployed.md)
